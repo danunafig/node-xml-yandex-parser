@@ -3,7 +3,7 @@ logs
 *.log
 
 # Config
-*.conf
+*.conf.json
       
 # Runtime data
 pids
