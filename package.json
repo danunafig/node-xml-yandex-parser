@@ -1,0 +1,28 @@
+{
+  "name": "node-xml-yandex-parser",
+  "version": "0.0.0",
+  "description": "yandex xml keyword analytics",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/danunafig/node-xml-yandex-parser.git"
+  },
+  "keywords": [
+    "yandex"
+  ],
+  "author": "Denis Bystrov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danunafig/node-xml-yandex-parser/issues"
+  },
+  "homepage": "https://github.com/danunafig/node-xml-yandex-parser",
+  "dependencies": {
+    "xml2json": "~0.6.2",
+    "nconf": "~0.7.1",
+    "mongodb": "~2.0.33",
+    "debug": "~2.2.0"
+  }
+}
