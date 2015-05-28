@@ -30,7 +30,17 @@ if (nconf.get('help')) {
 // Framework core lib
 var ya = new ctr(nconf);
 
-ya.loadKeywords(function(error, result) {
+ya.loadKeywords(function(error, results) {
 
-    ya.done();
+    if(results.length > 0) {
+
+        ya.parseKeywords(results, function (err, status, result) {
+
+            ya.track(err, status, result);
+
+        });
+    } else {
+        ya.track("Nothing to parse", "done", null);
+    }
 });
+
