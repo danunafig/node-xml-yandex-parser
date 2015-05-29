@@ -4,6 +4,9 @@ logs
 
 # Config
 *.conf.json
+
+# Api
+api
       
 # Runtime data
 pids

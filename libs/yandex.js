@@ -1,5 +1,4 @@
-var misc  = require("./misc");
-mysql     = require('mysql'),
+var mysql     = require('mysql'),
 debug     = require('debug'),
 parser    = require('xml2json'),
 http      = require('http'),
@@ -106,8 +105,7 @@ Yandex.prototype.parseKeywords = function(keywords, cb) {
 
                 results.forEach(function(el) {
                     j++;
-                    var k = {"keyword_id": key.id, "position": j, "domain": crc.crc32(self.parseURL(el.doc.domain))};
-                    console.log(self.parseURL(el.doc.domain), crc.crc32(self.parseURL(el.doc.domain)));
+                    var k = {"keyword_id": key.id, "position": j, "domain": crc.crc32(self.parseURL(el.doc.domain)), timedAt: self.currentDate()};
 
                     self.logKeyword(k, function(err, status) {
                         if(err) {
@@ -129,17 +127,40 @@ Yandex.prototype.parseKeywords = function(keywords, cb) {
 };
 
 Yandex.prototype.logKeyword = function(key, cb) {
+
     var self = this;
 
-    self.connection.query('insert into yandex set ?', key, function(err, status) {
+    self.connection.beginTransaction(function(err) {
+      if (err) { throw err; }
 
-        if(err) {
-            error("logKeywords", err);
+      self.connection.query('insert into yandex set ?', key, function(err, result) {
+
+        if (err) {
+          self.connection.rollback(function() {
             return cb(err, null);
-        } else {
-            log(status);
-            return cb(null, status);
+          });
         }
+
+        self.connection.query('update keywords set updatedAt = NOW() where id=?', key.keyword_id, function(err, result) {
+          if (err) {
+            self.connection.rollback(function() {
+                return cb(err, null);
+            });
+          }
+
+          self.connection.commit(function(err) {
+            if (err) {
+
+              self.connection.rollback(function() {
+                  return cb(err, null);
+              });
+            }
+
+            return cb(null, true);
+
+          });
+        });
+      });
     });
 };
 
@@ -172,6 +193,24 @@ Yandex.prototype.track = function(err, status, result) {
     }
 
 
+};
+
+Yandex.prototype.currentDate = function(url) {
+
+    var today = new Date();
+    var dd = today.getDate();
+    var mm = today.getMonth() + 1; //January is 0!
+    var yyyy = today.getFullYear();
+
+    if(dd<10) {
+        dd='0'+dd
+    }
+
+    if(mm<10) {
+        mm='0'+mm
+    }
+
+    return yyyy+"-"+mm+"-"+dd;
 };
 
 
